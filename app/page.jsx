@@ -23,7 +23,7 @@ export default function Home() {
       </header>
 
       <section className="mb-12">
-        <div className="rounded-lg bg-gradient-to-r from-violet-950 via-violet-900 to-violet-800 p-8 text-white">
+        <div className="rounded-lg bg-gradient-to-r from-primary-foreground  to-muted p-8 dark:text-white text-neutral-800">
           <div className="max-w-2xl">
             <h2 className="text-4xl font-bold mb-4">
               Find Your Next Experience

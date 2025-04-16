@@ -7,16 +7,17 @@ import { useUser } from "@/context/user-context"
 
 export default function EventsList() {
   const { user } = useUser()
+
   const {
     data: events,
-    isLoading,
+    status,
     error,
   } = useQuery({
     queryKey: ["events"],
     queryFn: fetchEvents,
   })
 
-  if (isLoading) {
+  if (status === "pending") {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Array(6)
@@ -43,7 +44,11 @@ export default function EventsList() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {events.map((event) => (
-        <EventCard key={event.id} event={event} isRegistered={user?.registeredEvents?.includes(event.id)} />
+        <EventCard
+          key={event.id}
+          event={event}
+          isRegistered={user?.registeredEvents?.includes(event.id)}
+        />
       ))}
     </div>
   )

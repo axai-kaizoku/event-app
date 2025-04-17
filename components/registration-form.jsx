@@ -48,7 +48,7 @@ export default function RegistrationForm({ event }) {
     defaultValues: {
       fullName: user?.name || "",
       email: user?.email || "",
-      phone: "",
+      phone: user?.phone || "",
       dietaryRequirements: "",
       agreeToTerms: false,
     },

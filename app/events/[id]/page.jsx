@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useUser } from "@/context/user-context"
-import { fetchEventById } from "@/lib/api"
+import { fetchEventById, unregisterFromEvent } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -17,11 +17,14 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { CalendarIcon, ClockIcon, MapPinIcon, UsersIcon } from "lucide-react"
 import Link from "next/link"
+import { useToast } from "@/hooks/use-toast"
 
 export default function EventDetailsPage() {
   const { id } = useParams()
   const router = useRouter()
-  const { user } = useUser()
+  const { user, updateUser } = useUser()
+  const { toast } = useToast()
+  const queryClient = useQueryClient()
   const [isRegistering, setIsRegistering] = useState(false)
 
   const {
@@ -42,6 +45,108 @@ export default function EventDetailsPage() {
 
     // Navigate to registration form
     router.push(`/events/${id}/register`)
+  }
+
+  // const handleUnregister = async () => {
+  //   if (!user) return
+
+  //   setIsRegistering(true)
+  //   try {
+  //     await unregisterFromEvent({ userId: user.id, eventId: event.id })
+
+  //     await queryClient.invalidateQueries({
+  //       queryKey: ["event", id],
+  //       exact: false,
+  //       refetchType: "all",
+  //     })
+
+  //     await queryClient.invalidateQueries({
+  //       queryKey: ["events"],
+  //       exact: false,
+  //       refetchType: "all",
+  //     })
+
+  //     router.refresh()
+  //     router.push("/")
+
+  //     toast({
+  //       title: "Unregistered successfully!",
+  //       description: `You've successfully unregistered for ${event.title}`,
+  //     })
+  //   } catch (err) {
+  //     console.error("Failed to unregister", err)
+  //     toast({
+  //       title: "Failed to Unregistered",
+  //       description: `Error unregistering for ${event.title}`,
+  //     })
+  //   } finally {
+  //     setIsRegistering(false)
+  //   }
+  // }
+  const handleUnregister = async () => {
+    if (!user) return
+
+    setIsRegistering(true)
+    try {
+      await unregisterFromEvent({ userId: user.id, eventId: event.id })
+
+      // 1. Update user in localStorage
+      const updatedUser = {
+        ...user,
+        registeredEvents: user.registeredEvents?.filter(
+          (eventId) => eventId !== event.id
+        ),
+      }
+      localStorage.setItem("user", JSON.stringify(updatedUser))
+
+      // setUser(updatedUser)
+      updateUser(updatedUser)
+
+      // 2. Update user in context if setUser is available
+      // Assuming useUser provides setUser
+      if (typeof window !== "undefined") {
+        const userUpdatedEvent = new CustomEvent("userUpdated", {
+          detail: updatedUser,
+        })
+        window.dispatchEvent(userUpdatedEvent)
+      }
+
+      // 3. Invalidate queries
+      await queryClient.invalidateQueries({
+        queryKey: ["event", id],
+        exact: false,
+        refetchType: "all",
+      })
+
+      await queryClient.invalidateQueries({
+        queryKey: ["events"],
+        exact: false,
+        refetchType: "all",
+      })
+
+      await queryClient.invalidateQueries({
+        queryKey: ["user"],
+      })
+
+      // 4. Toast
+      toast({
+        title: "Unregistered successfully!",
+        description: `You've successfully unregistered from "${event.title}"`,
+      })
+
+      // 5. Refresh + redirect
+      router.refresh()
+      router.push("/")
+    } catch (err) {
+      console.error("Failed to unregister", err)
+      toast({
+        title: "Failed to unregister",
+        description: `There was a problem unregistering from "${event.title}".`,
+        variant: "destructive",
+      })
+    } finally {
+      setIsRegistering(false)
+    }
   }
 
   if (isLoading) {
@@ -145,12 +250,17 @@ export default function EventDetailsPage() {
         </CardContent>
         <CardFooter>
           {isUserRegistered ? (
-            <div className="w-full">
-              <div className="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 px-4 py-3 rounded-md mb-4">
+            <div className="w-full space-y-3">
+              <div className="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 px-4 py-3 rounded-md">
                 You're registered for this event!
               </div>
-              <Button variant="outline" className="w-full" asChild>
-                <Link href="/profile">View My Registrations</Link>
+              <Button
+                variant="destructive"
+                className="w-full"
+                onClick={handleUnregister}
+                disabled={isRegistering}
+              >
+                Cancel Registration
               </Button>
             </div>
           ) : (

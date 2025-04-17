@@ -2,6 +2,8 @@ import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { UserProvider } from "@/context/user-context"
 import { QueryProvider } from "@/context/query-provider"
+import Header from "@/components/header"
+import Footer from "@/components/footer"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -22,7 +24,13 @@ export default function RootLayout({ children }) {
           disableTransitionOnChange
         >
           <QueryProvider>
-            <UserProvider>{children}</UserProvider>
+            <UserProvider>
+              <div className="flex flex-col min-h-screen">
+                <Header />
+                <main className="flex-1">{children}</main>
+                <Footer />
+              </div>
+            </UserProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>

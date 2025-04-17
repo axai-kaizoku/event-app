@@ -6,7 +6,13 @@ import { useQuery } from "@tanstack/react-query"
 import { useUser } from "@/context/user-context"
 import { fetchUserEvents } from "@/lib/api"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import EventCard from "@/components/event-card"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -14,7 +20,7 @@ import { UserIcon } from "lucide-react"
 
 export default function ProfilePage() {
   const router = useRouter()
-  const { user, logout } = useUser()
+  const { user, logout, isUserLoading } = useUser()
 
   const { data: userEvents, isLoading } = useQuery({
     queryKey: ["userEvents", user?.id],
@@ -23,10 +29,10 @@ export default function ProfilePage() {
   })
 
   useEffect(() => {
-    if (!user) {
+    if (!isUserLoading && !user) {
       router.push("/login?redirect=/profile")
     }
-  }, [user, router])
+  }, [user, isUserLoading, router])
 
   if (!user) {
     return null
@@ -89,9 +95,11 @@ export default function ProfilePage() {
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <p className="text-muted-foreground mb-4">You haven't registered for any upcoming events yet.</p>
+                    <p className="text-muted-foreground mb-4">
+                      You haven't registered for any upcoming events yet.
+                    </p>
                     <Button asChild>
-                      <a href="/events">Browse Events</a>
+                      <a href="/#events">Browse Events</a>
                     </Button>
                   </div>
                 )}
@@ -109,12 +117,19 @@ export default function ProfilePage() {
                 ) : userEvents?.past.length ? (
                   <div className="grid grid-cols-1 gap-4">
                     {userEvents.past.map((event) => (
-                      <EventCard key={event.id} event={event} isRegistered isPast />
+                      <EventCard
+                        key={event.id}
+                        event={event}
+                        isRegistered
+                        isPast
+                      />
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <p className="text-muted-foreground">No past events found.</p>
+                    <p className="text-muted-foreground">
+                      No past events found.
+                    </p>
                   </div>
                 )}
               </TabsContent>

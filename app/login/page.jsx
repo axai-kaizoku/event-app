@@ -8,14 +8,31 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
 import { useUser } from "@/context/user-context"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input, PasswordInput } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
 
 const schema = yup
   .object({
-    email: yup.string().email("Please enter a valid email").required("Email is required"),
+    email: yup
+      .string()
+      .email("Please enter a valid email")
+      .required("Email is required"),
     password: yup.string().required("Password is required"),
   })
   .required()
@@ -46,21 +63,24 @@ export default function LoginPage() {
 
       // Mock user data
       const userData = {
-        id: "user-1",
-        name: "Demo User",
         email: data.email,
-        registeredEvents: ["1", "3"],
-        createdAt: new Date().toISOString(),
+        password: data.password,
       }
 
-      login(userData)
+      const res = login(userData)
 
-      toast({
-        title: "Login successful",
-        description: "Welcome back!",
-      })
-
-      router.push(redirect)
+      if (res) {
+        toast({
+          title: "Login successful",
+          description: "Welcome back!",
+        })
+        router.push(redirect)
+      } else {
+        toast({
+          title: "Login error",
+          description: "Invalid email or password",
+        })
+      }
     } catch (error) {
       toast({
         title: "Login failed",
@@ -77,7 +97,9 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Login</CardTitle>
-          <CardDescription>Enter your credentials to access your account</CardDescription>
+          <CardDescription>
+            Enter your credentials to access your account
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -89,7 +111,7 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="your.email@example.com" {...field} />
+                      <Input placeholder="Email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -103,7 +125,7 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <PasswordInput placeholder="Password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

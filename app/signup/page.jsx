@@ -8,26 +8,42 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
 import { useUser } from "@/context/user-context"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input, PasswordInput } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
 
 const schema = yup
   .object({
     name: yup.string().required("Name is required"),
-    email: yup.string().email("Please enter a valid email").required("Email is required"),
-    password: yup.string().min(8, "Password must be at least 8 characters").required("Password is required"),
-    confirmPassword: yup
+    email: yup
       .string()
-      .oneOf([yup.ref("password")], "Passwords must match")
-      .required("Please confirm your password"),
+      .email("Please enter a valid email")
+      .required("Email is required"),
+    password: yup
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .required("Password is required"),
   })
   .required()
 
 export default function SignupPage() {
   const router = useRouter()
-  const { login } = useUser()
+  const { signup } = useUser()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -37,7 +53,6 @@ export default function SignupPage() {
       name: "",
       email: "",
       password: "",
-      confirmPassword: "",
     },
   })
 
@@ -54,18 +69,26 @@ export default function SignupPage() {
         id: "user-" + Date.now(),
         name: data.name,
         email: data.email,
+        password: data.password,
         registeredEvents: [],
         createdAt: new Date().toISOString(),
       }
 
-      login(userData)
+      // login(userData)
+      const res = signup(userData)
 
-      toast({
-        title: "Account created",
-        description: "Your account has been created successfully",
-      })
-
-      router.push("/")
+      if (res) {
+        toast({
+          title: "Account created",
+          description: "Your account has been created successfully",
+        })
+        router.push("/")
+      } else {
+        toast({
+          title: "Account already exists",
+          description: "Your account email has been already registered",
+        })
+      }
     } catch (error) {
       toast({
         title: "Signup failed",
@@ -94,7 +117,7 @@ export default function SignupPage() {
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="John Doe" {...field} />
+                      <Input placeholder="Name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -108,7 +131,7 @@ export default function SignupPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="your.email@example.com" {...field} />
+                      <Input placeholder="Email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -122,21 +145,7 @@ export default function SignupPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
+                      <PasswordInput placeholder="Password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

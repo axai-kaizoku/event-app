@@ -4,6 +4,7 @@ import { UserProvider } from "@/context/user-context"
 import { QueryProvider } from "@/context/query-provider"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -28,6 +29,7 @@ export default function RootLayout({ children }) {
               <div className="flex flex-col min-h-screen">
                 <Header />
                 <main className="flex-1">{children}</main>
+                <Toaster />
                 <Footer />
               </div>
             </UserProvider>
@@ -37,5 +39,3 @@ export default function RootLayout({ children }) {
     </html>
   )
 }
-
-import "./globals.css"

@@ -6,7 +6,14 @@ import { useQuery } from "@tanstack/react-query"
 import { useUser } from "@/context/user-context"
 import { fetchEventById } from "@/lib/api"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CalendarIcon, ClockIcon, MapPinIcon, UsersIcon } from "lucide-react"
 import Link from "next/link"
@@ -52,7 +59,7 @@ export default function EventDetailsPage() {
                 The event you're looking for doesn't exist or has been removed.
               </p>
               <Button asChild>
-                <Link href="/events">Browse Events</Link>
+                <Link href="/#events">Browse Events</Link>
               </Button>
             </div>
           </CardContent>
@@ -70,7 +77,9 @@ export default function EventDetailsPage() {
           <div className="flex justify-between items-start">
             <div>
               <CardTitle className="text-3xl">{event.title}</CardTitle>
-              <CardDescription className="text-lg mt-2">{event.organizer}</CardDescription>
+              <CardDescription className="text-lg mt-2">
+                {event.organizer}
+              </CardDescription>
             </div>
             <div className="px-3 py-1 rounded-full bg-primary/10 text-primary font-medium text-sm">
               {event.category}
@@ -80,10 +89,16 @@ export default function EventDetailsPage() {
         <CardContent>
           <div className="aspect-video rounded-md overflow-hidden mb-6 bg-muted">
             {event.image ? (
-              <img src={event.image || "/placeholder.svg"} alt={event.title} className="w-full h-full object-cover" />
+              <img
+                src={event.image || "/placeholder.svg"}
+                alt={event.title}
+                className="w-full h-full object-cover"
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <span className="text-muted-foreground">No image available</span>
+                <span className="text-muted-foreground">
+                  No image available
+                </span>
               </div>
             )}
           </div>
@@ -123,7 +138,9 @@ export default function EventDetailsPage() {
 
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-3">About This Event</h3>
-            <p className="text-muted-foreground whitespace-pre-line">{event.description}</p>
+            <p className="text-muted-foreground whitespace-pre-line">
+              {event.description}
+            </p>
           </div>
         </CardContent>
         <CardFooter>
@@ -141,9 +158,13 @@ export default function EventDetailsPage() {
               className="w-full"
               size="lg"
               onClick={handleRegister}
-              disabled={isRegistering || event.registeredCount >= event.capacity}
+              disabled={
+                isRegistering || event.registeredCount >= event.capacity
+              }
             >
-              {event.registeredCount >= event.capacity ? "Event Full" : "Register Now"}
+              {event.registeredCount >= event.capacity
+                ? "Event Full"
+                : "Register Now"}
             </Button>
           )}
         </CardFooter>

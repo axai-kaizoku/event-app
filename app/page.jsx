@@ -26,7 +26,7 @@ export default function Home() {
       <section id="events" className="mb-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold">Upcoming Events</h2>
-          <Link href="/events">
+          <Link href="/#events">
             <Button variant="ghost">View All</Button>
           </Link>
         </div>

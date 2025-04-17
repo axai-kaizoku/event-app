@@ -24,7 +24,7 @@ export default function Header() {
               Home
             </Link>
             <Link
-              href="/events"
+              href="/#events"
               className="text-sm hover:text-primary transition-colors"
             >
               Events

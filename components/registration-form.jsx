@@ -8,7 +8,15 @@ import * as yup from "yup"
 import { useUser } from "@/context/user-context"
 import { registerForEvent } from "@/lib/api"
 import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -17,10 +25,15 @@ import { useToast } from "@/hooks/use-toast"
 const schema = yup
   .object({
     fullName: yup.string().required("Full name is required"),
-    email: yup.string().email("Please enter a valid email").required("Email is required"),
+    email: yup
+      .string()
+      .email("Please enter a valid email")
+      .required("Email is required"),
     phone: yup.string().required("Phone number is required"),
     dietaryRequirements: yup.string(),
-    agreeToTerms: yup.boolean().oneOf([true], "You must agree to the terms and conditions"),
+    agreeToTerms: yup
+      .boolean()
+      .oneOf([true], "You must agree to the terms and conditions"),
   })
   .required()
 
@@ -69,7 +82,8 @@ export default function RegistrationForm({ event }) {
     } catch (error) {
       toast({
         title: "Registration failed",
-        description: "There was an error processing your registration. Please try again.",
+        description:
+          "There was an error processing your registration. Please try again.",
         variant: "destructive",
       })
     } finally {
@@ -115,7 +129,16 @@ export default function RegistrationForm({ event }) {
             <FormItem>
               <FormLabel>Phone Number</FormLabel>
               <FormControl>
-                <Input placeholder="+1 (555) 123-4567" {...field} />
+                <Input
+                  placeholder="+1 (555) 123-4567"
+                  {...field}
+                  onChange={(e) => {
+                    const cleaned = e.target.value.replace(/[^\d+]/g, "")
+                    field.onChange(cleaned)
+                  }}
+                  max={15}
+                  type="tel"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -129,9 +152,14 @@ export default function RegistrationForm({ event }) {
             <FormItem>
               <FormLabel>Dietary Requirements (Optional)</FormLabel>
               <FormControl>
-                <Textarea placeholder="Please list any dietary restrictions or allergies" {...field} />
+                <Textarea
+                  placeholder="Please list any dietary restrictions or allergies"
+                  {...field}
+                />
               </FormControl>
-              <FormDescription>Let us know if you have any special dietary needs or allergies</FormDescription>
+              <FormDescription>
+                Let us know if you have any special dietary needs or allergies
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -143,12 +171,16 @@ export default function RegistrationForm({ event }) {
           render={({ field }) => (
             <FormItem className="flex flex-row items-start space-x-3 space-y-0">
               <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel>I agree to the terms and conditions</FormLabel>
                 <FormDescription>
-                  By checking this box, you agree to our Terms of Service and Privacy Policy.
+                  By checking this box, you agree to our Terms of Service and
+                  Privacy Policy.
                 </FormDescription>
                 <FormMessage />
               </div>

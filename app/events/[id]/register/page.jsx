@@ -5,13 +5,20 @@ import { useQuery } from "@tanstack/react-query"
 import { fetchEventById } from "@/lib/api"
 import { useUser } from "@/context/user-context"
 import RegistrationForm from "@/components/registration-form"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useEffect } from "react"
 
 export default function RegisterPage() {
   const { id } = useParams()
   const router = useRouter()
-  const { user } = useUser()
+  const { user, isUserLoading } = useUser()
 
   const { data: event, isLoading } = useQuery({
     queryKey: ["event", id],
@@ -19,12 +26,13 @@ export default function RegisterPage() {
   })
 
   // Redirect if not logged in
-  if (!user) {
-    router.push("/login?redirect=/events/" + id + "/register")
-    return null
-  }
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push("/login?redirect=/events/" + id + "/register")
+    }
+  }, [user, isUserLoading, router, id])
 
-  if (isLoading) {
+  if (isLoading || isUserLoading) {
     return (
       <div className="container mx-auto px-4 py-12">
         <Card className="max-w-xl mx-auto">
@@ -51,7 +59,7 @@ export default function RegisterPage() {
   }
 
   if (!event) {
-    router.push("/events")
+    router.push("/#events")
     return null
   }
 
@@ -60,7 +68,9 @@ export default function RegisterPage() {
       <Card className="max-w-xl mx-auto">
         <CardHeader>
           <CardTitle>Register for {event.title}</CardTitle>
-          <CardDescription>Please fill out the form below to complete your registration</CardDescription>
+          <CardDescription>
+            Please fill out the form below to complete your registration
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <RegistrationForm event={event} />
